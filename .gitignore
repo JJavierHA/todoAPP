@@ -1,0 +1,14 @@
+# ignoramos el entorno virtual
+env
+# las variables de entorno
+.env
+# base de datos
+todosApp.db
+*.db
+# carpeta cache y archivos python compilados
+__pycache__/
+TodoApp/__pycache__/
+*.pyc
+*.pyo
+# otros
+books/
