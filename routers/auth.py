@@ -54,6 +54,7 @@ class UserRequest(BaseModel):
     password: str
     role: str
 
+# establecemos un formato que sera guia para la devolucion del servidor 
 class Token(BaseModel):
     accessToken: str
     tokenType: str
@@ -101,7 +102,7 @@ async def creatUser(db: db_dependency ,userRequest: UserRequest):
 @router.post("/token", response_model=Token) # especificamos el modelo de respuesta echo con pydantic
 async def loginForAccessToken(dataForm: Annotated[OAuth2PasswordRequestForm, Depends()],
                               db: db_dependency):
-    user = authenticateUser(dataForm.username, dataForm.password, db)
+    user = authenticateUser(dataForm.username, dataForm.password, db) # validamos la existencia del usuario
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                                 detail='User not validated')
