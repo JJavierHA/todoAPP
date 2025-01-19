@@ -5,6 +5,8 @@ from models import Todos
 from database import sesionLocal # importamos el motor de la base de datos
 from starlette import status
 from pydantic import BaseModel, Field
+# importamos el modulo de autenticacion con nuestro usuario para usar los metodos HTTp
+from .auth import getCurrentUser # desempaquetar el token
 
 router = APIRouter() # creamos una instancia de FastAPI
 
@@ -30,34 +32,50 @@ def get_db():
 # especificamos el tipo de dato que se espera recibir
 # especificamos que esta variable depende de la funcion get
 db_dependency = Annotated[Session, Depends(get_db)] # creamos una variable que indica la dependencia de la conexion 
+# creamos una inyeccion de dependencias para nuestras funciones HTTP
+user_dependency = Annotated[dict, Depends(getCurrentUser)]
 
 #* agregamos validaciones a los endpoint generados
 #! Funcion GET
 @router.get("/", status_code=status.HTTP_200_OK)
-async def read_all(db: db_dependency):
-    return db.query(Todos).all()
+async def read_all(user:user_dependency, db: db_dependency):
+    if user is None:
+        HTTPException(status_code=401, detail="Authenticated fail.")
+    return db.query(Todos).filter(Todos.owner == user.get('id')).all()
 
 @router.get("/todo/{todoId}", status_code=status.HTTP_200_OK)
-async def readTodo(db: db_dependency, todoId: int = Path(gt=0)):
-    todo = db.query(Todos).filter(Todos.id == todoId).first()
+async def readTodo(user:user_dependency, db: db_dependency, 
+                   todoId: int = Path(gt=0)):
+    if user is None:
+        HTTPException(status_code=401, detail="Authenticated fail.")
+
+    todo = db.query(Todos).filter(Todos.id == todoId)\
+        .filter(Todos.owner == user.get('id')).first()
     if todo is not None:
         return todo
     raise HTTPException(status_code=404, detail="Todo not found.")
 
 #! Funcion POST
 @router.post("/todo", status_code=status.HTTP_201_CREATED)
-async def creatTodo(db: db_dependency, todoRequest: TodoRequest):
-    todo = Todos(**todoRequest.model_dump()) # creamos un objeto del modelo Todos
+async def creatTodo(user: user_dependency, db: db_dependency, 
+                    todoRequest: TodoRequest):
+    if user is None:
+        HTTPException(status_code=401, detail="Authenticated fail.")
+    # creamos un objeto del modelo Todos y le pasamos el id del usuario autenticado
+    todo = Todos(**todoRequest.model_dump(), owner=user.get('id'))
     db.add(todo) # agregamos a la base de datos el objto
     db.commit() # aplicamos los cambios manualmente
 
 #! Funcion PUT
 @router.put("/updateTodo/{todoId}", status_code=status.HTTP_204_NO_CONTENT)
-async def updateTodo(db: db_dependency, 
+async def updateTodo(user: user_dependency, db: db_dependency, 
                     todoReques: TodoRequest, 
                     todoId: int = Path(gt=0)):
+    if user is None:
+        HTTPException(status_code=401, detail="Authenticated fail.")
     # realizamos un filtro para encontrar el elemento
-    todo = db.query(Todos).filter(Todos.id == todoId).first()
+    todo = db.query(Todos).filter(Todos.id == todoId)\
+        .filter(Todos.owner == user.get('id')).first()
 
     # validamos que se devolvio algo
     if todo is None:
@@ -76,8 +94,14 @@ async def updateTodo(db: db_dependency,
 
 #! Funcion DELETE
 @router.delete("/deleteTodo/{todoId}", status_code=status.HTTP_204_NO_CONTENT)
-async def deleteTodo(db: db_dependency, todoId: int = Path(gt=0)):
-    todo = db.query(Todos).filter(Todos.id == todoId).first()
+async def deleteTodo(user: user_dependency ,db: db_dependency, 
+                     todoId: int = Path(gt=0)):
+    if user is None:
+        HTTPException(status_code=401, detail="Authenticated fail.")
+
+    todo = db.query(Todos).filter(Todos.id == todoId)\
+        .filter(Todos.owner == user.get('id')).first()
+        
     if todo is None:
         raise HTTPException(status_code=404, detail="Todo not found.")
     db.query(Todos).filter(Todos.id == todoId).delete() # filtramos el elemento y eliminamos

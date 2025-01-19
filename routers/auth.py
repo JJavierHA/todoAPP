@@ -36,9 +36,9 @@ def authenticateUser(username: str, password: str, db):
         return False
     return user
 
-def createAccessToken(username: str, userId: int, expiresDelta: timedelta):
+def createAccessToken(username: str, userId: int, role: str, expiresDelta: timedelta):
     # asignamos el payload del jwt
-    encode = {'sub': username, 'id': userId}
+    encode = {'sub': username, 'id': userId, 'role':role}
     # definimos el tiempo de vida del token para que este pueda caducar
     expires = datetime.now(timezone.utc) + expiresDelta
     encode.update({'exp': expires})
@@ -55,9 +55,10 @@ class UserRequest(BaseModel):
     role: str
 
 # establecemos un formato que sera guia para la devolucion del servidor 
+# ! es importante especificar los modelos de respuesta en formato camecalse
 class Token(BaseModel):
-    accessToken: str
-    tokenType: str
+    access_token: str
+    token_type: str 
 
 #! crearemos nuestra funcion de dependencias
 def get_db():
@@ -77,10 +78,11 @@ async def getCurrentUser(token: Annotated[str, Depends(oauth2Bearer)]):
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         username: str = payload.get('sub')
         userId: str = payload.get('id')
+        role: str = payload.get('role')
         if username is None or userId is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                                 detail='User not validated')
-        return {'username': username, 'id': userId}
+        return {'username': username, 'id': userId, 'role':role}
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                             detail='User not validated')
@@ -106,8 +108,8 @@ async def loginForAccessToken(dataForm: Annotated[OAuth2PasswordRequestForm, Dep
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                                 detail='User not validated')
-    token = createAccessToken(user.userName, user.id, timedelta(minutes=20))
-    return {'accessToken': token, 'tokenType': 'bearer'} # segimos la estructura del modelo de respuesta establecido
+    token = createAccessToken(user.userName, user.id, user.role, timedelta(minutes=20))
+    return {'access_token': token, 'token_type': 'bearer'} # segimos la estructura del modelo de respuesta establecido
 
 #* es importante hasear las contrasenias almacenadas con la finalidad de que en 
 #* dado caso de algun vulnerabilidad este pueda tener un nivel de seguriad y no
