@@ -5,9 +5,13 @@ from sqlalchemy import create_engine # creara un motor para la coneccion con la 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-SQLALCHEMY_DATABASE_URL = 'sqlite:///./todosApp.db' # creamos la ruta donde se generara la base de datos
+#! conexion con sqlite3
+# SQLALCHEMY_DATABASE_URL = 'sqlite:///./todosApp.db' # creamos la ruta donde se generara la base de datos
+# engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False})
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False})
+#! coneccion con postgreSQL
+SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:josejavier14@localhost:5432/todoapp'
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 sesionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) # generamos una sesion local
 
