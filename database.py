@@ -4,13 +4,18 @@
 from sqlalchemy import create_engine # creara un motor para la coneccion con la base de datos
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from dotenv import load_dotenv
+import os
+
+# cargamos las varianles de entorno de el archivo .env
+load_dotenv()
 
 #! conexion con sqlite3
 # SQLALCHEMY_DATABASE_URL = 'sqlite:///./todosApp.db' # creamos la ruta donde se generara la base de datos
 # engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False})
 
 #! coneccion con postgreSQL
-SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:josejavier14@localhost:5432/todoapp'
+SQLALCHEMY_DATABASE_URL = os.getenv('DB_URL') # importamos el valor de la base de datos
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 sesionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) # generamos una sesion local

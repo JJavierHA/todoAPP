@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Path, HTTPException # Depends sirve para
 from models import Users
 from database import sesionLocal # importamos el motor de la base de datos
 from starlette import status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 # importamos el modulo de autenticacion con nuestro usuario para usar los metodos HTTp
 from .auth import getCurrentUser # desempaquetar el token
 from passlib.context import CryptContext # modulo para la encriptacion
@@ -35,6 +35,9 @@ class ChangePasswordRequest(BaseModel):
     oldPassword: str
     newpassword: str
 
+class ChangePhoneNumber(BaseModel):
+    phone: str = Field(min_length=9, max_length=10)
+
 #! creamos las funciones que puede hacer un usuario de tipo adminstrador 
 @router.get('/', status_code=status.HTTP_200_OK)
 async def getUser(user: user_dependency, db: db_dependency):
@@ -59,3 +62,17 @@ async def changePassword(user: user_dependency, db: db_dependency,
     # guardamos los cambios
     db.add(user)
     db.commit()
+
+# creamos una funcion para cambiar el nuemero de telelefono 
+@router.put("/changePhone", status_code=status.HTTP_204_NO_CONTENT)
+async def changePhone(user: user_dependency, db: db_dependency, 
+                      phoneRequest: ChangePhoneNumber):
+    if user is None:
+        raise HTTPException(status_code=401, detail="Authentication Faild.")
+    
+    user = db.query(Users).filter(Users.id == user.get('id')).first()
+
+    # hacemos el cambio de datos 
+    user.phone = phoneRequest.phone
+    db.add(user) # agregamos los cambios
+    db.commit() # aplicamos los cambios

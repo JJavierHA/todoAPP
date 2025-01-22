@@ -53,6 +53,7 @@ class UserRequest(BaseModel):
     lastName: str
     password: str
     role: str
+    phone: str = Field(min_length=9, max_length=10)
 
 # establecemos un formato que sera guia para la devolucion del servidor 
 # ! es importante especificar los modelos de respuesta en formato camecalse
@@ -96,7 +97,8 @@ async def creatUser(db: db_dependency ,userRequest: UserRequest):
         firstName = userRequest.firstName,
         lastName = userRequest.lastName,
         hashedPassword = bcrypt_context.hash(userRequest.password), # creamos el hash de nuestra contrasenia
-        role = userRequest.role
+        role = userRequest.role,
+        phone = userRequest.phone,
     )
     db.add(newUser)
     db.commit()

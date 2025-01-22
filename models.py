@@ -12,6 +12,7 @@ class Users(base):
     hashedPassword = Column(String)
     isActive = Column(Boolean, default=True)
     role = Column(String)
+    phone = Column(String) # creamos un nuevo campo
 
 class Todos(base):
     __tablename__ = "todos" # especificamos el nombre de la tabla que generaremos
