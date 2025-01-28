@@ -8,7 +8,9 @@ from pydantic import BaseModel, Field
 # importamos el modulo de autenticacion con nuestro usuario para usar los metodos HTTp
 from .auth import getCurrentUser # desempaquetar el token
 
-router = APIRouter() # creamos una instancia de FastAPI
+router = APIRouter(
+    tags=["Todos"]
+) # creamos una instancia de FastAPI
 
 #! creamos el modelo request de nuesto modelo Alchemy
 class TodoRequest(BaseModel):

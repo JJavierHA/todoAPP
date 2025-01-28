@@ -1,0 +1,26 @@
+services:
+  dumbo:
+    image: postgres
+    ports:
+      - "${PORT}:5432" # "puertoComputadora:puetoContenedor"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_DB}
+      - POSTGRES_DB=${POSTGRES_NAME_DB}
+    volumes:
+      - /var/lib/postgresql/data
+      # se almacenan en el volumen persistente local
+      # - postgres-data: /var/lib/postgresql/data
+
+  todoapp:
+    depends_on:
+      - dumbo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    links:
+      - dumbo
+# volumenes persistente en el sistema host
+# volumes:
+#   postgres-data:

@@ -1,0 +1,13 @@
+FROM python:3.12
+
+WORKDIR /home/app
+
+# COPY ./ ./ evitamos hacer una copia de los archivos por que tomara los archivos directamente para reflejar los cambios
+COPY requirements.txt ./
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 8000
+
+# agregamos el comando para refresacar el proyecto
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
