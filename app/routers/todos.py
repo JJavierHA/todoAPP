@@ -1,8 +1,8 @@
 from typing import Annotated # sirve para declarar dependencias
 from sqlalchemy.orm import Session # sirve para crear sesiones en las bases de datos
 from fastapi import APIRouter, Depends, Path, HTTPException # Depends sirve para la inyeccion de dependencias
-from models import Todos
-from database import sesionLocal # importamos el motor de la base de datos
+from ..models import Todos
+from ..database import sesionLocal # importamos el motor de la base de datos
 from starlette import status
 from pydantic import BaseModel, Field
 # importamos el modulo de autenticacion con nuestro usuario para usar los metodos HTTp

@@ -1,0 +1,26 @@
+drop table if exists users;
+
+create table users(
+    id serial,
+    email varchar(400) default null,
+    "userName" varchar(45) default null,
+    "firstName" varchar(45) default null,
+    "lastName" varchar(45) default null,
+    "hashedPassword" varchar(200) default null,
+    "isActive" boolean default null,
+    role varchar(45) default null,
+    primary key (id)
+);
+
+drop table if exists todos;
+
+create table todos(
+  id serial,
+  title varchar(200) default null,
+  description varchar(200) default null,
+  priority integer default null,
+  complete boolean default null,
+  owner integer default null,
+  primary key (id),
+  foreign key (owner) references users(id)
+);

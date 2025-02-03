@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from models import Users
+from ..models import Users
 from starlette import status
 from passlib.context import CryptContext # modulo para la encriptacion
 # importamos lo relacionado a la base de datos
-from database import sesionLocal
+from ..database import sesionLocal
 from typing import Annotated # permite crear/asignar dependencias
 from sqlalchemy.orm import Session
 # uso de formularios para la creacion de tokens

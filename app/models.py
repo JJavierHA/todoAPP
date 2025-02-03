@@ -1,4 +1,4 @@
-from database import base # importamos el modelo base para generar los modelos en la base de datos
+from .database import base # importamos el modelo base para generar los modelos en la base de datos
 from sqlalchemy import Integer, String, Boolean, Column, ForeignKey # importamos los tipos de datos y la columna
 
 class Users(base):
