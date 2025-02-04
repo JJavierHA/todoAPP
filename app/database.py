@@ -4,7 +4,7 @@
 from sqlalchemy import create_engine # creara un motor para la coneccion con la base de datos
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from app.config import settings
+from .config import settings
 
 #! conexion con sqlite3
 # SQLALCHEMY_DATABASE_URL = 'sqlite:///./todosApp.db' # creamos la ruta donde se generara la base de datos

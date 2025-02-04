@@ -39,7 +39,7 @@ client = TestClient(app)
 
 # creamos un fixture que devolvera un todo, lo eleminara y sera validado pos los test
 @pytest.fixture
-def test_todo():
+def test_todo(test_user):
     todo = Todos(
         title = "Verbos HTTP",
         description = "Prueba de fastapi",
@@ -59,7 +59,6 @@ def test_todo():
         connection.execute(text("DELETE FROM todos;"))
         connection.execute(text("ALTER SEQUENCE todos_id_seq RESTART WITH 1")) #! Reiniciamos la secuencia unicamente para base postgreSQL
         connection.commit()
-
 
 @pytest.fixture
 def test_user():
